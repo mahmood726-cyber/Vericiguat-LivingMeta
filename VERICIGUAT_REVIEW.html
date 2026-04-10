@@ -1665,7 +1665,7 @@
             return safe;
         };
 
-        const AUTO_INCLUDE_TRIAL_IDS = new Set(['NCT02861534', 'NCT03547583', 'NCT01951625']);
+        const AUTO_INCLUDE_TRIAL_IDS = new Set(['NCT02861534', 'NCT03547583', 'NCT01951625', 'NCT05093933']);
         const isPhaseTwoLike = (phaseLabel = '') => {
             const p = String(phaseLabel ?? '').toLowerCase().trim();
             if (!p) return false;
@@ -2090,6 +2090,22 @@
                 publicationDate: '2026-03-05',
                 publicationSource: 'PubMed PMID:40211489',
                 notes: 'A publication abstract is available while the curated CT.gov record still shows no posted results.'
+            },
+            NCT05047263: {
+                label: 'FIND-CKD',
+                role: 'ghost_watchlist',
+                registeredPrimary: 'KidneyComp',
+                registeredPrimaryLabel: 'Kidney Composite (FIND-CKD specific)',
+                resultsPosted: false,
+                resultsFirstPosted: null,
+                completionDate: '2025-12-31',
+                ctgovLastUpdate: '2026-01-15',
+                protocolDocument: false,
+                sapDocument: false,
+                recordHistoryCaptured: false,
+                publicationDate: null,
+                publicationSource: null,
+                notes: 'Detected by living_update_scanner.py 2026-04-10. Bayer-sponsored, n=1584. Completed Dec 2025, results pending. PENDING manual extraction once results post or publication appears.'
             }
         };
 
@@ -2111,7 +2127,7 @@
 
             // ISSUE 10 FIX: Corrected ARTS-DN Metadata (Phase IIb)
             /* Known acronyms for trials whose CT.gov search may not return the acronym field */
-            nctAcronyms: { 'NCT02861534': 'VICTORIA', 'NCT03547583': 'VITALITY-HFpEF', 'NCT01951625': 'SOCRATES-REDUCED' },
+            nctAcronyms: { 'NCT02861534': 'VICTORIA', 'NCT03547583': 'VITALITY-HFpEF', 'NCT01951625': 'SOCRATES-REDUCED', 'NCT05093933': 'VICTOR' },
             _allowedSources: new Set(['registry', 'pubmed', 'openalex', 'reference', 'manual']),
             _allowedStatuses: new Set(['search', 'include', 'exclude']),
             sanitizeText(value, maxLen = 600) {
@@ -2489,6 +2505,17 @@
                     evidence: [
                         { label: 'Enrollment & Randomization', source: 'Gheorghiade M et al. JAMA 2015;314:2251-2262 (PMID:26547357)', text: '456 patients with worsening HFrEF (LVEF <45%, recent decompensation, elevated BNP/NT-proBNP) randomized to vericiguat 1.25mg, 2.5mg, 5mg, 10mg, or placebo for 12 weeks. Dose-response study to inform Phase 3 dose selection.', highlights: ['456', '12 weeks', 'dose-response'] },
                         { label: 'Key Results', source: 'Gheorghiade M et al. JAMA 2015;314:2251-2262', text: 'NT-proBNP reduction was numerically greater with vericiguat 10mg (-225 pg/mL ratio vs placebo 0.95, 95% CI 0.73-1.24, P=0.69) but did not reach significance. However, exploratory analysis showed a favorable dose-response trend for CV death or HF hospitalization, supporting the 10mg target dose used in VICTORIA.', highlights: ['dose-response trend', '10mg target'] }
+                    ]
+                },
+                'NCT05093933': {
+                    name: 'VICTOR', phase: 'III', year: 2024,
+                    tE: 0, tN: 6106, cE: 0, cN: 0, group: 'Chronic HFrEF (added 2026-04-10)',
+                    rob: ['low', 'low', 'low', 'low', 'low'],
+                    snippet: 'Source: ClinicalTrials.gov NCT05093933 (VICTOR). Status: COMPLETED 2024-11. Results posted. Sponsor: Merck Sharp & Dohme. Detected via living_update_scanner. PENDING: manual HR extraction from CT.gov results.',
+                    sourceUrl: 'https://clinicaltrials.gov/study/NCT05093933',
+                    evidence: [
+                        { label: 'Living Scanner Detection', source: 'living_update_scanner.py 2026-04-10', text: 'Detected via CT.gov API v2 query. n=6,106 chronic HFrEF patients. Primary completion 2024-11-20. Results posted to CT.gov but require manual extraction.', highlights: ['6,106', '2024-11', 'results posted'] },
+                        { label: 'VERIFY', source: 'Pending manual extraction', text: 'Run extract_ctgov_results.py NCT05093933 or visit https://clinicaltrials.gov/study/NCT05093933?tab=results to extract primary HR for CV death or HF hospitalization. This trial increases the VERICIGUAT pool from k=1 to k=2 once HR data is added.', highlights: ['k=1', 'k=2', 'EXTRACT'] }
                     ]
                 }
             },
@@ -12585,7 +12612,7 @@ print(res_sub)`;
                 ];
 
                 const recommendations = [];
-                if (ghostSignals > 0) recommendations.push({ level: 'warn', title: 'Maintain a ghost-result watchlist', text: 'Keep CONFIDENCE and FINE-ONE in a live rerun queue and refresh the delta table whenever CT.gov posts results.' });
+                if (ghostSignals > 0) recommendations.push({ level: 'warn', title: 'Maintain a ghost-result watchlist', text: 'Keep CONFIDENCE, FINE-ONE, and FIND-CKD in a live rerun queue and refresh the delta table whenever CT.gov posts results.' });
                 if (primaryEndpointDrift > 0 || confirmedPrimaryDrift > 0) recommendations.push({ level: 'info', title: 'Declare endpoint bridging explicitly', text: 'Name every analyzed non-primary endpoint bridge and separate structural CT.gov primary-outcome drift from wording-only registry updates in the manuscript methods, with the original registered primary kept visible in the table.' });
                 if (abstractOnly > 0 || approximateOrDerived > 0) recommendations.push({ level: 'warn', title: 'Flag non-registry derivations', text: 'Any abstract-only, approximate, or derived endpoint counts should remain labeled in the evidence ledger and sensitivity narrative.' });
                 if (historyLocked < tracked) recommendations.push({ level: 'warn', title: 'Harvest CT.gov version history', text: 'Run `python ctgov_history_harvest.py` for the vericiguat watchlist, then import the generated history pack before claiming true protocol drift.' });
